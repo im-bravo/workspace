@@ -4,7 +4,7 @@
 #--------------------------------------------------------------------------
 #
 
-FROM phusion/baseimage:latest
+FROM phusion/baseimage:0.9.9
 
 MAINTAINER Mahmoud Zalt <mahmoud@zalt.me>
 
@@ -18,59 +18,60 @@ ENV LANG=en_US.UTF-8
 ENV TERM xterm
 
 # Add the "PHP 5" ppa
-RUN apt-get install -y software-properties-common && \
-    add-apt-repository -y ppa:ondrej/php
+#RUN apt-get install -y software-properties-common && \
+#    add-apt-repository -y ppa:ondrej/php5
+#RUN apt-get update && apt-get install -y python-software-properties software-properties-common && \
+#    add-apt-repository ppa:ondrej/php5-oldstable
+#apt-get update
+#apt-cache policy php5
 
-#
-#--------------------------------------------------------------------------
-# Software's Installation
-#--------------------------------------------------------------------------
-#
 
-# Install "PHP Extentions", "libraries", "Software's"
+RUN apt-get update && apt-get install -y python-software-properties software-properties-common
+
 RUN apt-get update && \
-    apt-get install -y --allow-downgrades --allow-remove-essential \
-        --allow-change-held-packages \
-        php5.4-cli \
-        php5.4-common \
-        php5.4-curl \
-        php5.4-intl \
-        php5.4-json \
-        php5.4-xml \
-        php5.4-mbstring \
-        php5.4-mcrypt \
-        php5.4-mysql \
-        php5.4-pgsql \
-        php5.4-sqlite \
-        php5.4-sqlite3 \
-        php5.4-zip \
-        php5.4-bcmath \
-        php5.4-memcached \
-        php5.4-gd \
-        php5.4-dev \
-        pkg-config \
+    apt-get install -y \
+		pkg-config \
         libcurl4-openssl-dev \
         libedit-dev \
-        libssl-dev \
-        libxml2-dev \
-        xz-utils \
-        libsqlite3-dev \
-        sqlite3 \
-        git \
-        curl \
-        vim \
-        nano \
-        postgresql-client \
-    && apt-get clean
+		libssl-dev \
+		libxml2-dev \
+		xz-utils \
+		libsqlite3-dev \
+		sqlite3 \
+		git \
+		curl \
+		vim \
+		nano \
+	&& apt-get clean
+
+
+
+
+RUN curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
+RUN chmod +x phpbrew
+RUN mv phpbrew /usr/local/bin/phpbrew
+
+
+RUN apt-get install -y libbz2-dev bzip2
+RUN apt-get install -y libmcrypt-dev gcc make autoconf libc-dev libreadline6 libreadline6-dev
+RUN apt-get install -y libxslt-dev
+
+RUN apt-get -y install php5-cli
+RUN phpbrew init
+RUN phpbrew known --update
+RUN phpbrew update
+RUN phpbrew install 5.4.34 +default
+RUN php -v
+
 
 #####################################
 # Composer:
 #####################################
 
 # Install composer and add its bin to the PATH.
-RUN curl -s http://getcomposer.org/installer | php && \
-    echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
-    mv composer.phar /usr/local/bin/composer
-
+#RUN curl -s http://getcomposer.org/installer | php && \
+#    echo "export PATH=${PATH}:/var/www/vendor/bin" >> ~/.bashrc && \
+#    mv composer.phar /usr/local/bin/composer
+#
 # Source the bash
-RUN . ~/.bashrc
+#RUN . ~/.bashrc
